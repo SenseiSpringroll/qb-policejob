@@ -7,24 +7,26 @@ PlayerJob = {}
 local DutyBlips = {}
 
 -- Functions
-local function CreateDutyBlips(playerId, playerLabel, playerJob, playerLocation)
+local DutyBlips = {}
+
+local function CreateDutyBlips(playerId, playerLabel, playerJob,blipNum,blipSize,blipColorNum,playerLocation)
     local ped = GetPlayerPed(playerId)
     local blip = GetBlipFromEntity(ped)
+    local pedVehicle = GetVehiclePedIsIn( ped, false);
     if not DoesBlipExist(blip) then
         if NetworkIsPlayerActive(playerId) then
             blip = AddBlipForEntity(ped)
         else
             blip = AddBlipForCoord(playerLocation.x, playerLocation.y, playerLocation.z)
         end
-        SetBlipSprite(blip, 1)
-        ShowHeadingIndicatorOnBlip(blip, true)
-        SetBlipRotation(blip, math.ceil(playerLocation.w))
-        SetBlipScale(blip, 1.0)
-        if playerJob == "police" then
-            SetBlipColour(blip, 38)
-        else
-            SetBlipColour(blip, 5)
-        end
+            SetBlipScale(blip, blipSize)
+            SetBlipSprite(blip, blipNum)
+            ShowHeadingIndicatorOnBlip(blip, true)
+            SetBlipRotation(blip, math.ceil(playerLocation.w))
+       
+        SetBlipColour(blip, blipColorNum)
+
+        
         SetBlipAsShortRange(blip, true)
         BeginTextCommandSetBlipName('STRING')
         AddTextComponentString(playerLabel)
@@ -69,7 +71,7 @@ AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
         TriggerEvent('qb-clothing:client:loadOutfit', trackerClothingData)
     end
 
-    if PlayerJob and PlayerJob.name ~= "police" then
+    if PlayerJob and PlayerJob.type ~= "leo" then
         if DutyBlips then
             for _, v in pairs(DutyBlips) do
                 RemoveBlip(v)
@@ -113,6 +115,7 @@ RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
     TriggerServerEvent("police:server:UpdateBlips")
 end)
 
+
 RegisterNetEvent('police:client:sendBillingMail', function(amount)
     SetTimeout(math.random(2500, 4000), function()
         local gender = Lang:t('info.mr')
@@ -130,8 +133,7 @@ RegisterNetEvent('police:client:sendBillingMail', function(amount)
 end)
 
 RegisterNetEvent('police:client:UpdateBlips', function(players)
-    if PlayerJob and (PlayerJob.name == 'police' or PlayerJob.name == 'ambulance') and
-        PlayerJob.onduty then
+    if PlayerJob and (PlayerJob.name == 'police' or PlayerJob.name == 'ambulance' or PlayerJob.name == 'bcso') and PlayerJob.onduty then 
         if DutyBlips then
             for _, v in pairs(DutyBlips) do
                 RemoveBlip(v)
@@ -141,8 +143,7 @@ RegisterNetEvent('police:client:UpdateBlips', function(players)
         if players then
             for _, data in pairs(players) do
                 local id = GetPlayerFromServerId(data.source)
-                CreateDutyBlips(id, data.label, data.job, data.location)
-
+                CreateDutyBlips(id, data.label, data.job, data.blipNum, data.blipSize, data.blipColorNum, data.location)
             end
         end
     end
@@ -213,4 +214,20 @@ CreateThread(function()
         AddTextComponentString(station.label)
         EndTextCommandSetBlipName(blip)
     end
+end)
+
+RegisterNetEvent('qb-policejob:client:checkwarrant', function()
+    local playerId = GetPlayerServerId(PlayerId())
+    QBCore.Functions.TriggerCallback('police:server:GetPlayerWarrants', function(iswanted, reason)
+        if iswanted then
+            print("test")
+            --exports['okokChatV2']:Message('linear-gradient(90deg, rgba(42, 42, 42, 0.9) 0%, rgba(53, 219, 194, 0.9) 100%)', '#35dbc2', 'fas fa-briefcase', 'Warrant Information', '', 'You have an active warrant!', playerId)
+            TriggerEvent("chatMessage", "Warrant Information", "warning", "You currently have an active warrant for your arrest regarding "..reason)
+
+        else
+            print("none")
+            --exports['okokChatV2']:Message('linear-gradient(90deg, rgba(42, 42, 42, 0.9) 0%, rgba(53, 219, 194, 0.9) 100%)', '#35dbc2', 'fas fa-briefcase', 'Warrant Information', '', 'You do not have any active warrants!', playerId)        
+            TriggerEvent("chatMessage", "Warrant Information", "warning", "You do not have any active warrants")
+        end
+     end)
 end)
