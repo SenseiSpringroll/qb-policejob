@@ -17,13 +17,21 @@ Config.LicenseRank = 2
 Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
 Config.Locations = {
     ["duty"] = {
-        [1] = vector3(440.085, -974.924, 30.689),
+        --[1] = vector3(440.085, -974.924, 30.689),
         [2] = vector3(-449.811, 6012.909, 31.815),
     },
-    ["vehicle"] = {
-        [1] = vector4(448.159, -1017.41, 28.562, 90.654),
-        [2] = vector4(471.13, -1024.05, 28.17, 274.5),
-        [3] = vector4(-455.39, 6002.02, 31.34, 87.93),
+    -- Following the formula below you can add as many locations as you want coords = where the Ped spawns, spawn = where the vehicle spawns
+    ["vehicleped"] = {
+        -- MRPD
+        {
+            coords = vector4(441.57, -974.77, 25.7, 181.71),
+            spawn = vector4(445.41, -988.94, 25.7, 273.0),
+        },
+        -- Paleto
+        {
+            coords = vector4(-461.22, 6027.42, 31.49, 321.76),
+            spawn = vector4(-476.49, 6032.56, 31.34, 222.19),
+        }
     },
     ["stash"] = {
         [1] = vector3(453.075, -980.124, 30.889),
@@ -37,7 +45,7 @@ Config.Locations = {
         [2] = vector4(-475.43, 5988.353, 31.716, 31.34),
     },
     ["armory"] = {
-        [1] = vector3(462.23, -981.12, 30.68),
+        [1] = vector3(485.47, -995.27, 30.69),
     },
     ["trash"] = {
         [1] = vector3(439.0907, -976.746, 30.776),
@@ -388,6 +396,15 @@ Config.Items = {
             info = {},
             type = "item",
             slot = 17,
+            authorizedJobGrades = {0, 1, 2, 3, 4}
+        },
+        [18] = {
+            name = "policetablet",
+            price = 0,
+            amount = 5,
+            info = {},
+            type = "item",
+            slot = 18,
             authorizedJobGrades = {0, 1, 2, 3, 4}
         }
     }

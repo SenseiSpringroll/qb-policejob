@@ -218,11 +218,17 @@ QBCore.Commands.Add("clearcasings", Lang:t("commands.clear_casign"), {}, false, 
     end
 end)
 
-QBCore.Commands.Add("jail", Lang:t("commands.jail_player"), {}, false, function(source)
+QBCore.Commands.Add("jail", Lang:t("commands.jail_player"), {{name = "id", help = Lang:t('info.player_id')}, {name = "time", help = Lang:t('info.jail_time')}}, true, function(source, args)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty then
-        TriggerClientEvent("police:client:JailPlayer", src)
+        local playerId = tonumber(args[1])
+        local time = tonumber(args[2])
+        if time > 0 then
+            TriggerClientEvent("police:client:JailCommand", src, playerId, time)
+        else
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('info.jail_time_no'), 'error')
+        end
     else
         TriggerClientEvent('QBCore:Notify', src, Lang:t("error.on_duty_police_only"), 'error')
     end
