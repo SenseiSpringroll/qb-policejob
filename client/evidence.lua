@@ -315,13 +315,13 @@ CreateThread(function()
     while true do
         Wait(10)
         if LocalPlayer.state.isLoggedIn then
-            if PlayerJob.name == 'police' and PlayerJob.onduty then
+            if PlayerJob.type == 'leo' and PlayerJob.onduty then
                 if IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT` then
                     if next(Casings) then
                         local pos = GetEntityCoords(PlayerPedId(), true)
                         for k, v in pairs(Casings) do
                             local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            if dist < 1.5 then
+                            if dist < 10 then
                                 CurrentCasing = k
                             end
                         end
@@ -330,7 +330,7 @@ CreateThread(function()
                         local pos = GetEntityCoords(PlayerPedId(), true)
                         for k, v in pairs(Blooddrops) do
                             local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            if dist < 1.5 then
+                            if dist < 10 then
                                 CurrentBlooddrop = k
                             end
                         end
@@ -339,7 +339,7 @@ CreateThread(function()
                         local pos = GetEntityCoords(PlayerPedId(), true)
                         for k, v in pairs(Fingerprints) do
                             local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            if dist < 1.5 then
+                            if dist < 10 then
                                 CurrentFingerprint = k
                             end
                         end
