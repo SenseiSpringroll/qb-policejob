@@ -3,7 +3,7 @@
 
 Edited version of the original https://github.com/qbcore-framework/qb-policejob
 
-#This is my first attempt at editing a resource to this dr=egree so the code is probably a little messy, I apologize.
+#This is my first attempt at editing a resource to this degree so the code is probably a little messy, I apologize.
 
 
 This edit of qb-policejob Includes mobile finger scanner. Made usage of Randolio's mobile finger scanner, just broke it down into snippets and integrated it in https://github.com/Randolio/randol_fingerprint and Includes Ped interaction for garage ( so far ) to take out and store Police Vehicles. Supports multi-Department as well
@@ -73,5 +73,17 @@ To make a new department simply add them into your qb-core/shared/jobs.lua and p
 ```
 
 And that's it. The rest is already done.
+
+
+
+Update 1.0
+- Fully added multi-department support
+- check to see if you have warrants through ps-mdt
+- updated blip support to support multi
+- updated evidence to see at a farther range rather than standing directly on it
+- Added Ped integration on/off duty
+- added Ped integration for armory
+- both of the above ped integrations come with MRPD and gabz paleto locations preconfigured.
+- Short little preview as well https://streamable.com/wsrixc
 
 
