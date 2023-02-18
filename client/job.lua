@@ -721,24 +721,24 @@ local function impound()
 end
 
 -- Police Garage Thread
-local function garage()
-    CreateThread(function()
-        while true do
-            Wait(0)
-            if inGarage and PlayerJob.type == "leo" then
-                if PlayerJob.onduty then sleep = 5 end
-                if IsPedInAnyVehicle(PlayerPedId(), false) then
-                    if IsControlJustReleased(0, 38) then
-                        QBCore.Functions.DeleteVehicle(GetVehiclePedIsIn(PlayerPedId()))
-                        break
-                    end
-                end
-            else
-                break
-            end
-        end
-    end)
-end
+--local function garage()
+--    CreateThread(function()
+--        while true do
+--            Wait(0)
+--            if inGarage and PlayerJob.type == "leo" then
+--                if PlayerJob.onduty then sleep = 5 end
+--                if IsPedInAnyVehicle(PlayerPedId(), false) then
+--                    if IsControlJustReleased(0, 38) then
+--                        QBCore.Functions.DeleteVehicle(GetVehiclePedIsIn(PlayerPedId()))
+--                        break
+--                    end
+--                end
+--            else
+--                break
+--            end
+--        end
+--    end)
+--end
 
 
 
@@ -748,12 +748,22 @@ if Config.UseTarget then
     CreateThread(function()
         -- Toggle Duty
         for k, v in pairs(Config.Locations["duty"]) do
-            exports['qb-target']:AddBoxZone("PoliceDuty_"..k, vector3(v.x, v.y, v.z), 1, 1, {
+            QBCore.Functions.LoadModel('s_m_y_cop_01')
+            while not HasModelLoaded('s_m_y_cop_01') do
+                Wait(100)
+            end
+            dutyPed = CreatePed(0, 's_m_y_cop_01', v.ped.x, v.ped.y, v.ped.z-1.0, v.ped.w, false, true)
+            TaskStartScenarioInPlace(dutyPed, true)
+            FreezeEntityPosition(dutyPed, true)
+            SetEntityInvincible(dutyPed, true)
+            SetBlockingOfNonTemporaryEvents(dutyPed, true)
+            TaskStartScenarioInPlace(dutyPed, "WORLD_HUMAN_GUARD_STAND", 0, true)
+            exports['qb-target']:AddBoxZone("PoliceDuty_"..k, vector4(v.ped.x, v.ped.y, v.ped.z, v.ped.w), 1, 1, {
                 name = "PoliceDuty_"..k,
                 heading = 11,
-                debugPoly = true,
-                minZ = v.z - 1,
-                maxZ = v.z + 1,
+                debugPoly = false,
+                minZ = v.ped.z - 1,
+                maxZ = v.ped.z + 1,
             }, {
                 options = {
                     {
@@ -764,7 +774,7 @@ if Config.UseTarget then
                         job = "police",
                     },
                 },
-                distance = 1.5
+                distance = 4.0
             })
         end
 
@@ -836,12 +846,21 @@ if Config.UseTarget then
 
         -- Armoury
         for k, v in pairs(Config.Locations["armory"]) do
-            exports['qb-target']:AddBoxZone("PoliceArmory_"..k, vector3(v.x, v.y, v.z), 1, 1, {
+            QBCore.Functions.LoadModel('s_m_y_marine_01')
+            while not HasModelLoaded('s_m_y_marine_01') do
+                Wait(100)
+            end
+            armoryPed = CreatePed(0, 's_m_y_marine_01', v.armory.x, v.armory.y, v.armory.z-1.0, v.armory.w, false, true)
+            TaskStartScenarioInPlace(armoryPed, true)
+            FreezeEntityPosition(armoryPed, true)
+            SetEntityInvincible(armoryPed, true)
+            SetBlockingOfNonTemporaryEvents(armoryPed, true)
+            exports['qb-target']:AddBoxZone("PoliceArmory_"..k, vector4(v.armory.x, v.armory.y, v.armory.z, v.armory.w), 1, 1, {
                 name = "PoliceArmory_"..k,
                 heading = 11,
-                debugPoly = true,
-                minZ = v.z - 1,
-                maxZ = v.z + 1,
+                debugPoly = false,
+                minZ = v.armory.z - 1,
+                maxZ = v.armory.z + 1,
             }, {
                 options = {
                     {
@@ -852,11 +871,10 @@ if Config.UseTarget then
                         job = "police",
                     },
                 },
-                distance = 1.5
+                distance = 4.0
             })
         end
-
-    end)
+end)
 
 else
 
@@ -866,7 +884,7 @@ else
         dutyZones[#dutyZones+1] = BoxZone:Create(
             vector3(vector3(v.x, v.y, v.z)), 1.75, 1, {
             name="box_zone",
-            debugPoly = true,
+            debugPoly = flase,
             minZ = v.z - 1,
             maxZ = v.z + 1,
         })
@@ -1005,11 +1023,12 @@ CreateThread(function()
         evidenceZones[#evidenceZones+1] = BoxZone:Create(
             vector3(vector3(v.x, v.y, v.z)), 2, 1, {
             name="box_zone",
-            debugPoly = true,
+            debugPoly = false,
             minZ = v.z - 1,
             maxZ = v.z + 1,
         })
     end
+
 
     local evidenceCombo = ComboZone:Create(evidenceZones, {name = "evidenceCombo", debugPoly = false})
     evidenceCombo:onPlayerInOut(function(isPointInside)
@@ -1122,20 +1141,6 @@ CreateThread(function()
     end)
 
 
-
-
-function GetClosestVehicleSpawn()
-    local currentSelection = 0
-    local plyCoords = GetEntityCoords(PlayerPedId(-1), false)
-    for k, v in pairs(Config.Locations["vehicle"]) do
-        local dist = Vdist(plyCoords.x, plyCoords.y, plyCoords.z, v.x, v.y, v.z)
-        if dist < 10 then
-            currentSelection = k
-            print(k)
-        end
-    end
-end
-
     -- Police Garage
     CreateThread(function()
         QBCore.Functions.LoadModel('ig_trafficwarden')
@@ -1160,7 +1165,7 @@ end
                         ["police"] = 0,
                         ["bcso"] = 0,
                         ["sasp"] = 0,
-                    }
+                    },
                     spawn = v.spawn
                 },
                 {
@@ -1178,8 +1183,8 @@ end
             distance = 2.0
         })
     end
-    end)
-    -- return vehicle
+end)
+-- return vehicle
 RegisterNetEvent('qb-policejob:returnveh', function()
     local ped = PlayerPedId()
     local car = GetVehiclePedIsIn(PlayerPedId(),true)
@@ -1223,4 +1228,6 @@ end)
 --        end
 --    end)
 --end)
+end)
+
 

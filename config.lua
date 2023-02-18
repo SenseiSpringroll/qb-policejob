@@ -17,8 +17,14 @@ Config.LicenseRank = 2
 Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
 Config.Locations = {
     ["duty"] = {
-        --[1] = vector3(440.085, -974.924, 30.689),
-        [2] = vector3(-449.811, 6012.909, 31.815),
+        -- MRPD
+        {
+            ped = vector4(442.78, -981.93, 30.69, 91.85)
+        },
+        -- Paleto
+        {
+            ped = vector4(-448.39, 6013.96, 32.29, 216.59)
+        }
     },
     -- Following the formula below you can add as many locations as you want coords = where the Ped spawns, spawn = where the vehicle spawns
     ["vehicleped"] = {
@@ -45,7 +51,14 @@ Config.Locations = {
         [2] = vector4(-475.43, 5988.353, 31.716, 31.34),
     },
     ["armory"] = {
-        [1] = vector3(485.47, -995.27, 30.69),
+        -- MRPD
+        {
+            armory = vector4(480.38, -996.54, 30.69, 92.53),
+        },
+        -- Paleto
+        {
+            armory = vector4(-445.89, 6014.78, 37.0, 233.33),
+        }
     },
     ["trash"] = {
         [1] = vector3(439.0907, -976.746, 30.776),
