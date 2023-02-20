@@ -35,7 +35,7 @@ Config.Locations = {
         },
         -- Paleto
         {
-            coords = vector4(-461.22, 6027.42, 31.49, 321.76),
+            coords = vector4(-463.23, 6025.33, 31.34, 138.98),
             spawn = vector4(-476.49, 6032.56, 31.34, 222.19),
         }
     },

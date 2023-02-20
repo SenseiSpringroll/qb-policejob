@@ -459,29 +459,9 @@ end)
 --         TakeOutVehicle(vehicle)
 -- end)
 
-
-
-RegisterNetEvent("police:client:TakeOutVehicle", function(data)
-    -- local VehicleSpawnCoord = GetClosestVehicleSpawn() -- Edit this
-    -- print(VehicleSpawnCoord)
-    local VehicleSpawnCoord = data.currentSelection
-    print(json.encode(data))
-    QBCore.Functions.SpawnVehicle(data.vehicle, function(veh)
-        print("callback")
-        local plate = "CAR" .. math.random(1111, 5555)
-        SetVehicleNumberPlateText(veh, plate)
-        SetEntityHeading(veh, VehicleSpawnCoord.w)
-        SetEntityAsMissionEntity(veh, true, true)
-        SetCarItemsInfo()
-        exports['ps-fuel']:SetFuel(veh, 100.0)
-        TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
-        TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
-    end, vector3(VehicleSpawnCoord.x,VehicleSpawnCoord.y,VehicleSpawnCoord.z), true)
-end)
-
 RegisterNetEvent('police:client:EvidenceStashDrawer', function(data)
     local currentEvidence = data.currentEvidence
-    local pos = GetEntityCoords(PlayerPedId())
+    --local pos = GetEntityCoords(PlayerPedId())
     local takeLoc = Config.Locations["evidence"][currentEvidence]
 
     if not takeLoc then return end
@@ -1147,43 +1127,129 @@ CreateThread(function()
         while not HasModelLoaded('ig_trafficwarden') do
             Wait(100)
         end
-    for k, v in pairs(Config.Locations["vehicleped"]) do
-        customped = CreatePed(0, 'ig_trafficwarden', v.coords.x, v.coords.y, v.coords.z-1.0, v.coords.w, false, true)
-        TaskStartScenarioInPlace(customped, true)
-        FreezeEntityPosition(customped, true)
-        SetEntityInvincible(customped, true)
-        SetBlockingOfNonTemporaryEvents(customped, true)
-        TaskStartScenarioInPlace(customped, 'WORLD_HUMAN_CLIPBOARD', 0, true)
-        exports['qb-target']:AddTargetEntity(customped, {
-            options = {
-                {
-                    icon = 'fa-solid fa-warehouse',
-                    label = 'Open Garage',
-                    type = "client",
-                    event = "police:client:VehicleMenuHeader",
-                    job = {
-                        ["police"] = 0,
-                        ["bcso"] = 0,
-                        ["sasp"] = 0,
+        for k, v in pairs(Config.Locations["vehicleped"]) do
+            customped = CreatePed(0, 'ig_trafficwarden', v.coords.x, v.coords.y, v.coords.z-1.0, v.coords.w, false, true)
+            TaskStartScenarioInPlace(customped, true)
+            FreezeEntityPosition(customped, true)
+            SetEntityInvincible(customped, true)
+            SetBlockingOfNonTemporaryEvents(customped, true)
+            TaskStartScenarioInPlace(customped, 'WORLD_HUMAN_CLIPBOARD', 0, true)
+            exports['qb-target']:AddTargetEntity(customped, {
+                options = {
+                    {
+                        targeticon = "fa-solid fa-shield",
+                        icon = 'fa-solid fa-warehouse',
+                        label = 'Open Garage',
+                        type = "client",
+                        event = "police:client:VehicleMenuHeader",
+                        job = {
+                            ["police"] = 0,
+                            ["bcso"] = 0,
+                            ["sasp"] = 0,
+                        },
+                        spawn = v.spawn
                     },
-                    spawn = v.spawn
+                    {
+                        icon = 'fa-solid fa-car',
+                        label = 'Store Vehicle',
+                        type = "client",
+                        event  = "qb-policejob:returnveh",
+                        job = {
+                            ["police"] = 0,
+                            ["bcso"] = 0,
+                            ["sasp"] = 0,
+                        }
+                    }
                 },
-                {
-                    icon = 'fa-solid fa-car',
-                    label = 'Store Vehicle',
-                    type = "client",
-                    event  = "qb-policejob:returnveh",
-                    job = {
-                        ["police"] = 0,
-                        ["bcso"] = 0,
-                        ["sasp"] = 0,
+                distance = 4.0
+            })
+        end
+    end)
+    
+    local VehicleTable = {
+        ["police"] = {
+            "police",
+            "police2",
+            "police3",
+            "police4",
+            "policeb",
+            "policet",
+        },
+        ["sherrif"] = {
+            "sheriff",
+            "sheriff2",
+        },
+        ["bsco"] = {
+            "police2"
+        }
+    }
+    RegisterNetEvent("police:client:VehicleMenuHeader", function(data)
+        local Menu = {
+            {
+                header = Lang:t('menu.garage_title'),
+                isMenuHeader = true,
+                icon = "fas fa-warehouse",
+            }
+        }
+        for k,v in pairs(VehicleTable) do
+            Menu[#Menu+1] = {
+                header = k:upper(),
+                txt = "Select category for vehicles",
+                icon = "fa-solid fa-shield",
+                params = {
+                    event = "police:client:veh-category-selected",
+                    args = {
+                        category = k,
+                        location = data.spawn,
                     }
                 }
-            },
-            distance = 2.0
-        })
-    end
-end)
+            }
+        end
+        exports['qb-menu']:openMenu(Menu)
+    end)
+    
+    RegisterNetEvent('police:client:veh-category-selected', function(data)
+        local newtable = data.category
+        local result = VehicleTable[newtable]
+        if not result then return end
+        local Menu = {
+            {
+                header = Lang:t('menu.garage_title'),
+                isMenuHeader = true,
+                icon = "fas fa-warehouse",
+            }
+        }
+        for k,v in pairs(result) do
+            Menu[#Menu+1] = {
+                header = v:upper(),
+                txt = "",
+                icon = "fa-solid fa-shield",
+                params = {
+                    event = "police:client:TakeOutVehicle",
+                    args = {
+                        currentSelection = data.location,
+                        model = v,
+                    }
+                }
+            }
+        end
+        exports['qb-menu']:openMenu(Menu)
+    end)
+    
+    RegisterNetEvent("police:client:TakeOutVehicle", function(data)
+        local VehicleSpawnCoord = data.currentSelection
+        QBCore.Functions.SpawnVehicle(data.model, function(veh)
+            print("callback")
+            local plate = "CAR" .. math.random(1111, 5555)
+            SetVehicleNumberPlateText(veh, plate)
+            SetEntityHeading(veh, VehicleSpawnCoord.w)
+            SetEntityAsMissionEntity(veh, true, true)
+            SetCarItemsInfo()
+            exports['ps-fuel']:SetFuel(veh, 100.0)
+            TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
+            TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
+        end, vector3(VehicleSpawnCoord.x,VehicleSpawnCoord.y,VehicleSpawnCoord.z), true)
+    end)
 -- return vehicle
 RegisterNetEvent('qb-policejob:returnveh', function()
     local ped = PlayerPedId()
@@ -1228,6 +1294,41 @@ end)
 --        end
 --    end)
 --end)
+
+    -- evidence
+--        local coords = vector4(445.41, -988.94, 25.7, 273.0),
+--        QBCore.Functions.LoadModel('s_m_y_sheriff_01')
+--        while not HasModelLoaded('s_m_y_sheriff_01') do
+--            Wait(100)
+--        end
+--        evidencePed = CreatePed(0, 's_m_y_sheriff_01', coords.x, coords.y, coords.z-1.0, coords.w, false, true)
+--        TaskStartScenarioInPlace(evidencePed, true)
+--        FreezeEntityPosition(evidencePed, true)
+--        SetEntityInvincible(evidencePed, true)
+--        SetBlockingOfNonTemporaryEvents(evidencePed, true)
+--        TaskStartScenarioInPlace(evidencePed, "WORLD_HUMAN_GUARD_STAND", 0, true)
+--        exports['qb-target']:AddBoxZone("PoliceEvidence", vector4(coords.x, coords.y, coords.z, coords.w), 1, 1, {
+--            name = "PoliceEvidence",
+--            heading = 11,
+--            debugPoly = false,
+--            minZ = coords.z - 1,
+--            maxZ = coords.z + 1,
+--        }, {
+--            options = {
+--                {
+--                    
+--                    type = "client",
+--                    event = "qb-policejob:client:EvidenceStashDrawer",
+--                    icon = "fas fa-sign-in-alt",
+--                    label = "Open Evidence",
+--                    job = "police",
+--                },
+--            },
+--            distance = 4.0
+--        })
+--    end)
 end)
+
+
 
 

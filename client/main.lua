@@ -9,46 +9,25 @@ local DutyBlips = {}
 -- Functions
 local DutyBlips = {}
 
-local function CreateDutyBlips(playerId, playerLabel, playerJob, playerLocation)
+local function CreateDutyBlips(playerId, playerLabel, playerJob,blipNum,blipSize,blipColorNum,playerLocation)
     local ped = GetPlayerPed(playerId)
     local blip = GetBlipFromEntity(ped)
-    local pedinvehicle = IsPedInAnyVehicle(ped)
+    local pedVehicle = GetVehiclePedIsIn( ped, false);
     if not DoesBlipExist(blip) then
         if NetworkIsPlayerActive(playerId) then
             blip = AddBlipForEntity(ped)
         else
             blip = AddBlipForCoord(playerLocation.x, playerLocation.y, playerLocation.z)
         end
+            SetBlipScale(blip, blipSize)
+            SetBlipSprite(blip, blipNum)
+            ShowHeadingIndicatorOnBlip(blip, true)
+            SetBlipRotation(blip, math.ceil(playerLocation.w))
+       
+        SetBlipColour(blip, blipColorNum)
 
-        if playerJob == "police" then
-            Color = 42
-        elseif
-            playerJob == "bcso" then
-            Color = 4
-        elseif
-            playerJob == "sasp" then
-            Color = 40
-        elseif
-            playerJob == "saspr" then
-            Color = 52
-        elseif
-            playerJob == "ambulance" then
-            Color =  1
-        else
-            Color = 5
-        end
-        if pedinvehicle then
-            SetBlipSprite(blip, 812)
-            ShowHeadingIndicatorOnBlip(blip, true)
-        else
-            SetBlipSprite(blip, 1)
-            ShowHeadingIndicatorOnBlip(blip, true)
-        end
-        SetBlipRotation(blip, math.ceil(playerLocation.w))
-        SetBlipScale(blip, 0.8)
-        SetBlipColour(blip, Color)
+        
         SetBlipAsShortRange(blip, true)
-        SetBlipDisplay(blip, 4)
         BeginTextCommandSetBlipName('STRING')
         AddTextComponentString(playerLabel)
         EndTextCommandSetBlipName(blip)
@@ -154,8 +133,7 @@ RegisterNetEvent('police:client:sendBillingMail', function(amount)
 end)
 
 RegisterNetEvent('police:client:UpdateBlips', function(players)
-    if PlayerJob and (PlayerJob.name == "police" or PlayerJob.name == "sasp" or PlayerJob.name == "saspr" or PlayerJob.name == "bcso" or PlayerJob.name == 'ambulance') and
-        onDuty then
+    if PlayerJob and (PlayerJob.name == 'police' or PlayerJob.name == 'ambulance' or PlayerJob.name == 'bcso') and PlayerJob.onduty then 
         if DutyBlips then
             for _, v in pairs(DutyBlips) do
                 RemoveBlip(v)
@@ -165,8 +143,7 @@ RegisterNetEvent('police:client:UpdateBlips', function(players)
         if players then
             for _, data in pairs(players) do
                 local id = GetPlayerFromServerId(data.source)
-                CreateDutyBlips(id, data.label, data.job, data.location)
-
+                CreateDutyBlips(id, data.label, data.job, data.blipNum, data.blipSize, data.blipColorNum, data.location)
             end
         end
     end
