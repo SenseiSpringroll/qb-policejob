@@ -13,44 +13,13 @@ local function UpdateBlips()
     local dutyPlayers = {}
     local players = QBCore.Functions.GetQBPlayers()
     for _, v in pairs(players) do
-        if v and (v.PlayerData.job.name == "police" or v.PlayerData.job.name == "ambulance"  or v.PlayerData.job.name == "bcso") and v.PlayerData.job.onduty then
+        if v and (v.PlayerData.job.name == "police" or v.PlayerData.job.name == "sasp" or v.PlayerData.job.name == "saspr" or v.PlayerData.job.name == "bcso"or v.PlayerData.job.name == "ambulance") and v.PlayerData.job.onduty then
             local coords = GetEntityCoords(GetPlayerPed(v.PlayerData.source))
             local heading = GetEntityHeading(GetPlayerPed(v.PlayerData.source))
-            local ped = GetPlayerPed(v.PlayerData.source)
-            local vehiculoPed = GetVehiclePedIsIn(ped, false) 
-            local vehicleType = GetVehicleType(vehiculoPed)
-            -- BIKE
-            if vehiculoPed ~= 0 and vehicleType == "bike" then
-                blipNum = 348
-                blipSize = 1.0
-            -- HELICOPTER
-            elseif vehiculoPed ~= 0 and vehicleType == "heli" then
-                blipNum = 43
-                blipSize = 1.0
-            -- CAR
-            elseif vehiculoPed ~= 0 and vehicleType == "automobile" then
-                blipNum = 225
-                blipSize = 0.7
-            else
-                blipNum = 1
-                blipSize = 1.0
-            end
-
-            if v.PlayerData.job.name == "police" then
-                blipColorNum = 3
-            elseif v.PlayerData.job.name == "bcso" then
-                blipColorNum = 52
-            elseif v.PlayerData.job.name == "ambulance" then
-                blipColorNum = 76
-            end
-        
             dutyPlayers[#dutyPlayers+1] = {
                 source = v.PlayerData.source,
                 label = v.PlayerData.metadata["callsign"],
                 job = v.PlayerData.job.name,
-                blipNum = blipNum,
-                blipSize = blipSize,
-                blipColorNum= blipColorNum,
                 location = {
                     x = coords.x,
                     y = coords.y,
