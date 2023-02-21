@@ -109,27 +109,27 @@ local function doCarDamage(currentVehicle, veh)
 	end
 end
 
-function TakeOutImpound(vehicle)
-    local coords = Config.Locations["impound"][currentGarage]
-    if coords then
-        QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
-            local veh = NetToVeh(netId)
-            QBCore.Functions.TriggerCallback('qb-garage:server:GetVehicleProperties', function(properties)
-                QBCore.Functions.SetVehicleProperties(veh, properties)
-                SetVehicleNumberPlateText(veh, vehicle.plate)
-		SetVehicleDirtLevel(veh, 0.0)
-                SetEntityHeading(veh, coords.w)
-                exports['ps-fuel']:SetFuel(veh, vehicle.fuel)
-                doCarDamage(veh, vehicle)
-                TriggerServerEvent('police:server:TakeOutImpound', vehicle.plate, currentGarage)
-                closeMenuFull()
-                TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
-                TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
-                SetVehicleEngineOn(veh, true, true)
-            end, vehicle.plate)
-        end, vehicle.vehicle, coords, true)
-    end
-end
+--function TakeOutImpound(vehicle)
+--    local coords = Config.Locations["impound"][currentGarage]
+--    if coords then
+--        QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
+--            local veh = NetToVeh(netId)
+--            QBCore.Functions.TriggerCallback('qb-garage:server:GetVehicleProperties', function(properties)
+--                QBCore.Functions.SetVehicleProperties(veh, properties)
+--                SetVehicleNumberPlateText(veh, vehicle.plate)
+--		SetVehicleDirtLevel(veh, 0.0)
+--                SetEntityHeading(veh, coords.w)
+--                exports['ps-fuel']:SetFuel(veh, vehicle.fuel)
+--                doCarDamage(veh, vehicle)
+--                TriggerServerEvent('police:server:TakeOutImpound', vehicle.plate, currentGarage)
+--                closeMenuFull()
+--                TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
+--                TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
+--                SetVehicleEngineOn(veh, true, true)
+--            end, vehicle.plate)
+--        end, vehicle.vehicle, coords, true)
+--    end
+--end
 
 function TakeOutVehicle(vehicleInfo)
     local coords = Config.Locations["vehicle"][currentGarage]
@@ -447,6 +447,11 @@ RegisterNetEvent("police:client:ImpoundMenuHeader", function (data)
     currentGarage = data.currentSelection
 end)
 
+--RegisterNetEvent("police:client:VehicleMenuHeader", function (data)
+--    print(json.encode(data))
+--    MenuGarage(data.spawn)
+--end)
+
 RegisterNetEvent('police:client:TakeOutImpound', function(data)
     if inImpound then
         local vehicle = data.vehicle
@@ -528,7 +533,7 @@ RegisterNetEvent('qb-police:client:openArmoury', function()
     TriggerServerEvent("inventory:server:OpenInventory", "shop", "police", authorizedItems)
 end)
 
-RegisterNetEvent('qb-police:client:spawnHelicopter', function(k)
+RegisterNetEvent('qb-police:client:HelicopterSpawn', function(k)
     if IsPedInAnyVehicle(PlayerPedId(), false) then
         QBCore.Functions.DeleteVehicle(GetVehiclePedIsIn(PlayerPedId()))
     else
@@ -760,12 +765,22 @@ if Config.UseTarget then
 
         -- Personal Stash
         for k, v in pairs(Config.Locations["stash"]) do
-            exports['qb-target']:AddBoxZone("PoliceStash_"..k, vector3(v.x, v.y, v.z), 1.1, 1.1, {
+            QBCore.Functions.LoadModel('ig_andreas')
+            while not HasModelLoaded('ig_andreas') do
+                Wait(100)
+            end
+            stashPed = CreatePed(0, 'ig_andreas',v.stash.x, v.stash.y, v.stash.z-1.0, v.stash.w, false, true)
+            TaskStartScenarioInPlace(stashPed, true)
+            FreezeEntityPosition(stashPed, true)
+            SetEntityInvincible(stashPed, true)
+            SetBlockingOfNonTemporaryEvents(stashPed, true)
+            TaskStartScenarioInPlace(stashPed, "WORLD_HUMAN_GUARD_STAND", 0, true)
+            exports['qb-target']:AddBoxZone("PoliceStash_"..k, vector4(v.stash.x, v.stash.y, v.stash.z, v.stash.w), 1.1, 1.1, {
                 name = "PoliceStash_"..k,
                 heading = 11,
-                debugPoly = true,
-                minZ = v.z - 1,
-                maxZ = v.z + 1,
+                debugPoly = false,
+                minZ = v.stash.z - 1,
+                maxZ = v.stash.z + 1,
             }, {
                 options = {
                     {
@@ -776,7 +791,7 @@ if Config.UseTarget then
                         job = "police",
                     },
                 },
-                distance = 1.5
+                distance = 2.0
             })
         end
 
@@ -804,15 +819,26 @@ if Config.UseTarget then
 
         -- Fingerprint
         for k, v in pairs(Config.Locations["fingerprint"]) do
-            exports['qb-target']:AddBoxZone("PoliceFingerprint_"..k, vector3(v.x, v.y, v.z), 1, 1, {
+            QBCore.Functions.LoadModel('ig_michelle')
+            while not HasModelLoaded('ig_michelle') do
+                Wait(100)
+            end
+            fingerPed = CreatePed(0, 'ig_michelle', v.finger.x, v.finger.y, v.finger.z-1.0, v.finger.w, false, true)
+            TaskStartScenarioInPlace(fingerPed, true)
+            FreezeEntityPosition(fingerPed, true)
+            SetEntityInvincible(fingerPed, true)
+            SetBlockingOfNonTemporaryEvents(fingerPed, true)
+            TaskStartScenarioInPlace(fingerPed, "WORLD_HUMAN_CLIPBOARD", 0, true)
+            exports['qb-target']:AddBoxZone("PoliceFingerprint_"..k, vector4(v.finger.x, v.finger.y, v.finger.z, v.finger.w), 1, 1, {
                 name = "PoliceFingerprint_"..k,
                 heading = 11,
-                debugPoly = true,
-                minZ = v.z - 1,
-                maxZ = v.z + 1,
+                debugPoly = false,
+                minZ = v.finger.z - 1,
+                maxZ = v.finger.z + 1,
             }, {
                 options = {
                     {
+                        targeticon = "fas fa-fingerprint",
                         type = "client",
                         event = "qb-police:client:scanFingerPrint",
                         icon = "fas fa-fingerprint",
@@ -820,7 +846,7 @@ if Config.UseTarget then
                         job = "police",
                     },
                 },
-                distance = 1.5
+                distance = 3.0
             })
         end
 
@@ -1040,85 +1066,85 @@ CreateThread(function()
     end)
 
     -- Helicopter
-    local helicopterZones = {}
-    for _, v in pairs(Config.Locations["helicopter"]) do
-        helicopterZones[#helicopterZones+1] = BoxZone:Create(
-            vector3(vector3(v.x, v.y, v.z)), 10, 10, {
-            name="box_zone",
-            debugPoly = true,
-            minZ = v.z - 1,
-            maxZ = v.z + 1,
-        })
-    end
+    --local helicopterZones = {}
+    --for _, v in pairs(Config.Locations["helicopter"]) do
+    --    helicopterZones[#helicopterZones+1] = BoxZone:Create(
+    --        vector3(vector3(v.x, v.y, v.z)), 10, 10, {
+    --        name="box_zone",
+    --        debugPoly = true,
+    --        minZ = v.z - 1,
+    --        maxZ = v.z + 1,
+    --    })
+    --end
 
-    local helicopterCombo = ComboZone:Create(helicopterZones, {name = "helicopterCombo", debugPoly = false})
-    helicopterCombo:onPlayerInOut(function(isPointInside)
-        if isPointInside then
-            inHelicopter = true
-            if PlayerJob.type == 'leo' and PlayerJob.onduty then
-                if IsPedInAnyVehicle(PlayerPedId(), false) then
-                    exports['qb-core']:HideText()
-                    exports['qb-core']:DrawText(Lang:t('info.store_heli'), 'left')
-                    heli()
-                else
-                    exports['qb-core']:DrawText(Lang:t('info.take_heli'), 'left')
-                    heli()
-                end
-            end
-        else
-            inHelicopter = false
-            exports['qb-core']:HideText()
-        end
-    end)
+    --local helicopterCombo = ComboZone:Create(helicopterZones, {name = "helicopterCombo", debugPoly = false})
+    --helicopterCombo:onPlayerInOut(function(isPointInside)
+    --    if isPointInside then
+    --        inHelicopter = true
+    --        if PlayerJob.type == 'leo' and PlayerJob.onduty then
+    --            if IsPedInAnyVehicle(PlayerPedId(), false) then
+    --                exports['qb-core']:HideText()
+    --                exports['qb-core']:DrawText(Lang:t('info.store_heli'), 'left')
+    --                heli()
+    --            else
+    --                exports['qb-core']:DrawText(Lang:t('info.take_heli'), 'left')
+    --                heli()
+    --            end
+    --        end
+    --    else
+    --        inHelicopter = false
+    --        exports['qb-core']:HideText()
+    --    end
+    --end)
 
     -- Police Impound
-    local impoundZones = {}
-    for _, v in pairs(Config.Locations["impound"]) do
-        impoundZones[#impoundZones+1] = BoxZone:Create(
-            vector3(v.x, v.y, v.z), 1, 1, {
-            name="box_zone",
-            debugPoly = true,
-            minZ = v.z - 1,
-            maxZ = v.z + 1,
-            heading = 180,
-        })
-    end
+--    local impoundZones = {}
+--    for _, v in pairs(Config.Locations["impound"]) do
+--        impoundZones[#impoundZones+1] = BoxZone:Create(
+--            vector4(v.impound.x, v.impound.y, v.impound.z, v.impound.w), 1, 1, {
+--            name="box_zone",
+--            debugPoly = true,
+--            minZ = v.impound.z - 1,
+--            maxZ = v.impound.z + 1,
+--            heading = 180,
+--        })
+--    end
 
-    local impoundCombo = ComboZone:Create(impoundZones, {name = "impoundCombo", debugPoly = false})
-    impoundCombo:onPlayerInOut(function(isPointInside, point)
-        if isPointInside then
-            inImpound = true
-            if PlayerJob.type == 'leo' and PlayerJob.onduty then
-                if IsPedInAnyVehicle(PlayerPedId(), false) then
-                    exports['qb-core']:DrawText(Lang:t('info.impound_veh'), 'left')
-                    impound()
-                else
-                    local currentSelection = 0
-
-                    for k, v in pairs(Config.Locations["impound"]) do
-                        if #(point - vector3(v.x, v.y, v.z)) < 4 then
-                            currentSelection = k
-                        end
-                    end
-                    exports['qb-menu']:showHeader({
-                        {
-                            header = Lang:t('menu.pol_impound'),
-                            params = {
-                                event = 'police:client:ImpoundMenuHeader',
-                                args = {
-                                    currentSelection = currentSelection,
-                                }
-                            }
-                        }
-                    })
-                end
-            end
-        else
-            inImpound = false
-            exports['qb-menu']:closeMenu()
-            exports['qb-core']:HideText()
-        end
-    end)
+--    local impoundCombo = ComboZone:Create(impoundZones, {name = "impoundCombo", debugPoly = false})
+--    impoundCombo:onPlayerInOut(function(isPointInside, point)
+--        if isPointInside then
+--            inImpound = true
+--            if PlayerJob.type == 'leo' and PlayerJob.onduty then
+--                if IsPedInAnyVehicle(PlayerPedId(), false) then
+--                    exports['qb-core']:DrawText(Lang:t('info.impound_veh'), 'left')
+--                    impound()
+--                else
+--                    local currentSelection = 0
+--
+--                    for k, v in pairs(Config.Locations["impound"]) do
+--                        if #(point - vector3(v.x, v.y, v.z)) < 4 then
+--                            currentSelection = k
+--                        end
+--                    end
+--                    exports['qb-menu']:showHeader({
+--                        {
+--                            header = Lang:t('menu.pol_impound'),
+--                            params = {
+--                                event = 'police:client:ImpoundMenuHeader',
+--                                args = {
+--                                    currentSelection = currentSelection,
+--                                }
+--                            }
+--                        }
+--                    })
+--                end
+--            end
+--        else
+--            inImpound = false
+--            exports['qb-menu']:closeMenu()
+--            exports['qb-core']:HideText()
+--        end
+--    end)
 
 
     -- Police Garage
@@ -1137,7 +1163,6 @@ CreateThread(function()
             exports['qb-target']:AddTargetEntity(customped, {
                 options = {
                     {
-                        targeticon = "fa-solid fa-shield",
                         icon = 'fa-solid fa-warehouse',
                         label = 'Open Garage',
                         type = "client",
@@ -1247,9 +1272,11 @@ CreateThread(function()
             SetCarItemsInfo()
             exports['ps-fuel']:SetFuel(veh, 100.0)
             TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
+            TriggerServerEvent("inventory:server:addTrunkItems", QBCore.Functions.GetPlate(veh), Config.CarItems)
             TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
         end, vector3(VehicleSpawnCoord.x,VehicleSpawnCoord.y,VehicleSpawnCoord.z), true)
     end)
+    
 -- return vehicle
 RegisterNetEvent('qb-policejob:returnveh', function()
     local ped = PlayerPedId()
@@ -1265,6 +1292,165 @@ RegisterNetEvent('qb-policejob:returnveh', function()
     end
 end)
 
+-- impound
+CreateThread(function()
+    QBCore.Functions.LoadModel('ig_tomcasino')
+    while not HasModelLoaded('ig_tomcasino') do
+        Wait(100)
+    end
+    for k, v in pairs(Config.Locations["impound"]) do
+        impoundPed = CreatePed(0, 'ig_tomcasino', v.impound.x, v.impound.y, v.impound.z-1.0, v.impound.w, false, true)
+        TaskStartScenarioInPlace(impoundPed, true)
+        FreezeEntityPosition(impoundPed, true)
+        SetEntityInvincible(impoundPed, true)
+        SetBlockingOfNonTemporaryEvents(impoundPed, true)
+        TaskStartScenarioInPlace(impoundPed, 'WORLD_HUMAN_CLIPBOARD', 0, true)
+        exports['qb-target']:AddTargetEntity(impoundPed, {
+            options = {
+                {
+                    icon = 'fa-solid fa-warehouse',
+                    label = 'Open Impound',
+                    type = "client",
+                    event = "police:client:ImpoundMenuHeader",
+                    job = {
+                        ["police"] = 0,
+                        ["bcso"] = 0,
+                        ["sasp"] = 0,
+                    },
+                    vehicle = v.vehicle,
+                }
+            },
+            distance = 2.0
+        })
+    end
+end)
+
+RegisterNetEvent("police:client:ImpoundMenuHeader", function (data)
+    MenuImpound(data.currentSelection, data.vehicle)
+    currentGarage = data.currentSelection
+end)
+
+
+function MenuImpound(currentSelection, coords)
+    local impoundMenu = {
+        {
+            header = Lang:t('menu.impound'),
+            isMenuHeader = true
+        }
+    }
+    QBCore.Functions.TriggerCallback("police:GetImpoundedVehicles", function(result)
+        local shouldContinue = false
+        if result == nil then
+            QBCore.Functions.Notify(Lang:t("error.no_impound"), "error", 5000)
+        else
+            shouldContinue = true
+            for _ , v in pairs(result) do
+                local enginePercent = QBCore.Shared.Round(v.engine / 10, 0)
+                local currentFuel = v.fuel
+                local vname = QBCore.Shared.Vehicles[v.vehicle].name
+
+                impoundMenu[#impoundMenu+1] = {
+                    header = vname.." ["..v.plate.."]",
+                    txt =  Lang:t('info.vehicle_info', {value = enginePercent, value2 = currentFuel}),
+                    params = {
+                        event = "police:client:TakeOutImpound",
+                        args = {
+                            vehicle = v,
+                            coords = coords,
+                            currentSelection = currentSelection
+                        }
+                    }
+                }
+            end
+        end
+
+
+        if shouldContinue then
+            impoundMenu[#impoundMenu+1] = {
+                header = Lang:t('menu.close'),
+                txt = "",
+                params = {
+                    event = "qb-menu:client:closeMenu"
+                }
+            }
+            exports['qb-menu']:openMenu(impoundMenu)
+        end
+    end)
+
+end
+    -- Impound
+    RegisterNetEvent('police:client:TakeOutImpound', function(data)
+        local vehicle = data.vehicle
+        local coords = data.coords
+        QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
+            local veh = NetToVeh(netId)
+            QBCore.Functions.TriggerCallback('qb-garage:server:GetVehicleProperties', function(properties)
+                QBCore.Functions.SetVehicleProperties(veh, properties)
+                SetVehicleNumberPlateText(veh, vehicle.plate)
+                SetVehicleDirtLevel(veh, 0.0)
+                SetEntityHeading(veh, coords.w) 
+                exports['ps-fuel']:SetFuel(veh, vehicle.fuel)
+                doCarDamage(veh, vehicle)
+                TriggerServerEvent('police:server:TakeOutImpound', vehicle.plate, currentGarage)
+                closeMenuFull()
+                TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
+                TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
+                SetVehicleEngineOn(veh, true, true)
+            end, vehicle.plate)
+        end, vehicle.vehicle, coords, true)
+    end)
+end)
+
+-- Helicopter
+    CreateThread(function()
+        QBCore.Functions.LoadModel('ig_casey')
+    while not HasModelLoaded('ig_casey') do
+        Wait(100)
+    end
+    for k, v in pairs(Config.Locations["helicopter"]) do
+        helicopterPed = CreatePed(0, 'ig_casey', v.heliped.x, v.heliped.y, v.heliped.z-1.0, v.heliped.w, false, true)
+        TaskStartScenarioInPlace(helicopterPed, true)
+        FreezeEntityPosition(helicopterPed, true)
+        SetEntityInvincible(helicopterPed, true)
+        SetBlockingOfNonTemporaryEvents(helicopterPed, true)
+        TaskStartScenarioInPlace(helicopterPed, 'WORLD_HUMAN_CLIPBOARD', 0, true)
+        exports['qb-target']:AddTargetEntity(helicopterPed, {
+            options = {
+                {
+                    icon = 'fa-solid fa-helicopter',
+                    label = 'Open Heli Garage',
+                    type = "client",
+                    event = "qb-police:client:HelicopterSpawn",
+                    job = {
+                        ["police"] = 0,
+                        ["bcso"] = 0,
+                        ["sasp"] = 0,
+                    },
+                    helispawn = v.vehicle,
+                }
+            },
+            distance = 4.0
+        })
+    end
+end)
+
+RegisterNetEvent('police:client:TakeOutVehicle', function(data)
+    local coords = Config.Locations["helicopter"][k]
+    --local VehicleSpawnCoord = data.currentSelection
+    --QBCore.Functions.SpawnVehicle(data.model, function(veh)
+    QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
+        local veh = NetToVeh(netId)
+        SetVehicleLivery(veh , 0)
+        SetVehicleMod(veh, 0, 48)
+        SetVehicleNumberPlateText(veh, "ZULU"..tostring(math.random(1000, 9999)))
+        SetEntityHeading(veh, VehicleSpawnCoord.w)
+        SetVehicleDirtLevel(veh, 0.0)
+        exports['ps-fuel']:SetFuel(veh, 100.0)
+        TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
+        TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
+        SetVehicleEngineOn(veh, true, true)
+    end, vector3(VehicleSpawnCoord.x,VehicleSpawnCoord.y,VehicleSpawnCoord.z), true)
+end)
 --    local garageZones = {}
 --    for _, v in pairs(Config.Locations["vehicle"]) do
 --        garageZones[#garageZones+1] = BoxZone:Create(
@@ -1327,7 +1513,6 @@ end)
 --            distance = 4.0
 --        })
 --    end)
-end)
 
 
 

@@ -221,13 +221,13 @@ RegisterNetEvent('qb-policejob:client:checkwarrant', function()
     QBCore.Functions.TriggerCallback('police:server:GetPlayerWarrants', function(iswanted, reason)
         if iswanted then
             print("test")
-            --exports['okokChatV2']:Message('linear-gradient(90deg, rgba(42, 42, 42, 0.9) 0%, rgba(53, 219, 194, 0.9) 100%)', '#35dbc2', 'fas fa-briefcase', 'Warrant Information', '', 'You have an active warrant!', playerId)
-            TriggerEvent("chatMessage", "Warrant Information", "warning", "You currently have an active warrant for your arrest regarding "..reason)
+            exports['okokChatV2']:Message('linear-gradient(90deg, rgba(42, 42, 42, 0.9) 0%, rgba(53, 219, 194, 0.9) 100%)', '#35dbc2', 'fas fa-briefcase', 'Warrant Information', '', 'You have an active warrant!', playerId)
+            --TriggerEvent("chatMessage", "Warrant Information", "warning", "You currently have an active warrant for your arrest regarding "..reason)
 
         else
             print("none")
-            --exports['okokChatV2']:Message('linear-gradient(90deg, rgba(42, 42, 42, 0.9) 0%, rgba(53, 219, 194, 0.9) 100%)', '#35dbc2', 'fas fa-briefcase', 'Warrant Information', '', 'You do not have any active warrants!', playerId)        
-            TriggerEvent("chatMessage", "Warrant Information", "warning", "You do not have any active warrants")
+            exports['okokChatV2']:Message('linear-gradient(90deg, rgba(42, 42, 42, 0.9) 0%, rgba(53, 219, 194, 0.9) 100%)', '#35dbc2', 'fas fa-briefcase', 'Warrant Information', '', 'You do not have any active warrants!', playerId)        
+            --TriggerEvent("chatMessage", "Warrant Information", "warning", "You do not have any active warrants")
         end
      end)
 end)
