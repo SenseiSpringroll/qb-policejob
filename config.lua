@@ -14,6 +14,8 @@ Config.HandCuffItem = 'handcuffs'
 
 Config.LicenseRank = 2
 
+Config.mzskills = true -- set to false if you don't want the break cuff xp system feature turned on
+
 Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
 Config.Locations = {
     ["duty"] = {

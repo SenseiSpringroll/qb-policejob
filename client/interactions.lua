@@ -378,29 +378,150 @@ RegisterNetEvent('police:client:GetKidnappedDragger', function()
 end)
 
 RegisterNetEvent('police:client:GetCuffed', function(playerId, isSoftcuff)
-    local ped = PlayerPedId()   
+    local ped = PlayerPedId()
+	local parsetime = 4
+	if Config.mzskills then 
+		local lvl8 = false
+		local lvl7 = false
+		local lvl6 = false
+		local lvl5 = false
+		local lvl4 = false
+		local lvl3 = false
+		local lvl2 = false
+		local lvl1 = false
+		local lvl0 = false 
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 12800, function(hasskill)
+			if hasskill then lvl8 = true end
+		end)
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 6400, function(hasskill)
+			if hasskill then lvl7 = true end 
+		end)
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 3200, function(hasskill)
+			if hasskill then lvl6 = true end 
+		end)
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 1600, function(hasskill)
+			if hasskill then lvl5 = true end 
+		end)
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 800, function(hasskill)
+			if hasskill then lvl4 = true end
+		end)
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 400, function(hasskill)
+			if hasskill then lvl3 = true end
+		end)
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 200, function(hasskill)
+			if hasskill then lvl2 = true end 
+		end)
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 100, function(hasskill)
+			if hasskill then lvl1 = true end
+		end)   
+		exports["mz-skills"]:CheckSkill("Criminal Reputation", 0, function(hasskill)
+			if hasskill then lvl0 = true end
+		end)  
+		Wait(10)
+		if lvl8 then
+			local chance = math.random(1, 100)
+			if chance <= 25 then 
+				parsetime = 6
+			elseif chance > 25 and chance <= 50 then  
+				parsetime = 5 
+			else 
+				parsetime = 4
+			end 
+		elseif lvl7 then
+			local chance = math.random(1, 100)
+			if chance <= 15 then 
+				parsetime = 6
+			elseif chance > 15 and chance <= 35 then  
+				parsetime = 5 
+			else 
+				parsetime = 4
+			end 
+		elseif lvl6 then 
+			local chance = math.random(1, 100)
+			if chance <= 5 then 
+				parsetime = 6
+			elseif chance > 5 and chance <= 15 then  
+				parsetime = 5 
+			else 
+				parsetime = 4
+			end
+		elseif lvl5 then  
+			local chance = math.random(1, 100)
+			if chance <= 20 then 
+				parsetime = 5
+			elseif chance > 20 and chance <= 40 then  
+				parsetime = 4 
+			else 
+				parsetime = 3
+			end
+		elseif lvl4 then  
+			local chance = math.random(1, 100)
+			if chance <= 10 then 
+				parsetime = 5
+			elseif chance > 10 and chance <= 20 then  
+				parsetime = 4 
+			else 
+				parsetime = 3
+			end
+		elseif lvl3 then  
+			local chance = math.random(1, 100)
+			if chance <= 5 then 
+				parsetime = 5
+			elseif chance > 5 and chance <= 15 then  
+				parsetime = 4 
+			else 
+				parsetime = 3
+			end
+		elseif lvl2 then  
+			local chance = math.random(1, 100)
+			if chance <= 15 then 
+				parsetime = 4
+			elseif chance > 15 and chance <= 30 then  
+				parsetime = 3 
+			else 
+				parsetime = 2
+			end
+		elseif lvl1 then  
+			local chance = math.random(1, 100)
+			if chance <= 5 then 
+				parsetime = 4
+			elseif chance > 5 and chance <= 15 then  
+				parsetime = 3 
+			else 
+				parsetime = 2
+			end
+		elseif lvl0 then  
+			local chance = math.random(1, 100)
+			if chance <= 10 then 
+				parsetime = 3
+			else 
+				parsetime = 2
+			end
+		end 
+	end 
+	Wait(10)
     if not isHandcuffed then
         GetCuffedAnimation(playerId)
-            exports['ps-ui']:Circle(function(success) 
-                if success then 
-                    ClearPedTasks(PlayerPedId())
-                    QBCore.Functions.Notify("You broke free")
-                else 
-            isHandcuffed = true
-            TriggerServerEvent("police:server:SetHandcuffStatus", true)
-            ClearPedTasksImmediately(ped)
-            if GetSelectedPedWeapon(ped) ~= `WEAPON_UNARMED` then
-                SetCurrentPedWeapon(ped, `WEAPON_UNARMED`, true)
-            end
-            if not isSoftcuff then
-                cuffType = 16
-                QBCore.Functions.Notify("You are cuffed!")
-            else
-                cuffType = 49
-                QBCore.Functions.Notify("You are cuffed, but you can walk")
-            end
-        end
-    end, 1, 4)
+        exports['ps-ui']:Circle(function(success) 
+            if success then 
+                ClearPedTasks(PlayerPedId())
+                QBCore.Functions.Notify("You broke free")
+            else 
+				isHandcuffed = true
+				TriggerServerEvent("police:server:SetHandcuffStatus", true)
+				ClearPedTasksImmediately(ped)
+				if GetSelectedPedWeapon(ped) ~= `WEAPON_UNARMED` then
+					SetCurrentPedWeapon(ped, `WEAPON_UNARMED`, true)
+				end
+				if not isSoftcuff then
+					cuffType = 16
+					QBCore.Functions.Notify("You are cuffed!")
+				else
+					cuffType = 49
+					QBCore.Functions.Notify("You are cuffed, but you can walk")
+				end
+			end
+		end, 1, parsetime)
     else
         isHandcuffed = false
         isEscorted = false

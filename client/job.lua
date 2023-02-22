@@ -1426,7 +1426,7 @@ end)
                         ["bcso"] = 0,
                         ["sasp"] = 0,
                     },
-                    helispawn = v.vehicle,
+                    currentSelection = v,
                 }
             },
             distance = 4.0
@@ -1435,8 +1435,8 @@ end)
 end)
 
 RegisterNetEvent('police:client:TakeOutVehicle', function(data)
-    local coords = Config.Locations["helicopter"][k]
-    --local VehicleSpawnCoord = data.currentSelection
+    --local coords = Config.Locations["helicopter"][k]
+    local VehicleSpawnCoord = data.currentSelection
     --QBCore.Functions.SpawnVehicle(data.model, function(veh)
     QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
         local veh = NetToVeh(netId)
