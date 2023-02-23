@@ -12,6 +12,8 @@ Slowly working on making armory, on/off duty, stashes, impound etc all Interacte
 
 #installation
 
+make sure you have setr UseTarge true in your server.cfg
+
 Add this to qbcore/shared/items.lua
 ```lua
 ["policetablet"] = { ["name"] = "policetablet", ["label"] = "Police Tablet", ["weight"] = 5000, ["type"] = "item", ["image"] = "policetablet.png", ["unique"] = true, ['useable'] = true, ["shouldClose"] = true, ["combinable"] = nil, ["description"] = "A mobile fingerprint tablet." },
