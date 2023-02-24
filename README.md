@@ -12,6 +12,11 @@ This edit of qb-policejob Includes mobile finger scanner. Made usage of Randolio
 
 make sure you have setr UseTarge true in your server.cfg
 
+Started adding compatibility with mz-skills for numerous oncoming features!
+https://github.com/MrZainRP/mz-skills
+
+Can set mz-skills to false in Config if you dont want to use it
+
 Add this to qbcore/shared/items.lua
 ```lua
 ["policetablet"] = { ["name"] = "policetablet", ["label"] = "Police Tablet", ["weight"] = 5000, ["type"] = "item", ["image"] = "policetablet.png", ["unique"] = true, ['useable'] = true, ["shouldClose"] = true, ["combinable"] = nil, ["description"] = "A mobile fingerprint tablet." },
@@ -95,5 +100,12 @@ Update 1.0
 - added Ped integration for armory
 - both of the above ped integrations come with MRPD and gabz paleto locations preconfigured.
 - Short little preview as well https://streamable.com/wsrixc
+
+Update 1.1
+- Fixed the blips issue
+- added break free of cuff function
+- added a skill config option with mz-skills the higher the criminals skill level is the easier
+It will be for them to beat the minigame for breaking free. More will be added to benefit police in the future!
+- Kind of added Helicopter spawn ped. It works but not the way I want it to
 
 
