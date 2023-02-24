@@ -50,7 +50,7 @@ To make a new department simply add them into your qb-core/shared/jobs.lua and p
                 payment = 150
             },
         },
-	},
+    },
     ['sheriff'] = {
 		label = 'Blaine County Sheriff',
         type = "leo",
