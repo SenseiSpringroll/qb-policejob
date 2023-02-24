@@ -6,7 +6,7 @@ Edited version of the original https://github.com/qbcore-framework/qb-policejob
 #This is my first attempt at editing a resource to this degree so the code is probably a little messy, I apologize.
 
 
-This edit of qb-policejob Includes mobile finger scanner. Made usage of Randolio's mobile finger scanner, just broke it down into snippets and integrated it in https://github.com/Randolio/randol_fingerprint and Includes Ped interaction for garage ( so far ) to take out and store Police Vehicles. Supports multi-Department as well
+This edit of qb-policejob Includes mobile finger scanner. Made usage of Randolio's mobile finger scanner, just broke it down into snippets and integrated it in https://github.com/Randolio/randol_fingerprint and Includes Ped interaction and Supports multi-Department as well
 
 #installation
 
