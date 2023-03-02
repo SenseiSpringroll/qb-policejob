@@ -10,7 +10,7 @@ This edit of qb-policejob Includes mobile finger scanner. Made usage of Randolio
 
 #installation
 
-make sure you have setr UseTarge true in your server.cfg
+make sure you have setr UseTarget true in your server.cfg
 
 Started adding compatibility with mz-skills for numerous oncoming features!
 https://github.com/MrZainRP/mz-skills
