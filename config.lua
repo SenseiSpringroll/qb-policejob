@@ -81,9 +81,18 @@ Config.Locations = {
         }
     },
     ["evidence"] = {
-        [1] = vector3(442.1722, -996.067, 30.689),
-        [2] = vector3(451.7031, -973.232, 30.689),
-        [3] = vector3(455.1456, -985.462, 30.689),
+ 
+        { -- MRPD
+            evidence = vector4(472.29, -1000.34, 26.27, 312.07)
+        },
+ 
+        { -- MRPD 
+            evidence = vector4(472.54, -991.21, 26.27, 290.73)
+        },      
+
+        { -- MRPD 
+            evidence = vector4(446.83, -997.53, 30.69, 321.53)
+        },     
     },
     ["stations"] = {
         [1] = {label = "Police Station", coords = vector4(428.23, -984.28, 29.76, 3.5)},
