@@ -794,6 +794,43 @@ if Config.UseTarget then
                 distance = 2.0
             })
         end
+	
+	        -- evidence
+        for k, v in pairs(Config.Locations["evidence"]) do
+            QBCore.Functions.LoadModel('s_m_y_sheriff_01')
+            while not HasModelLoaded('s_m_y_sheriff_01') do
+                Wait(100)
+            end
+            evidencePed = CreatePed(0, 's_m_y_sheriff_01', v.evidence.x, v.evidence.y, v.evidence.z-1.0, v.evidence.w, false, true)
+            TaskStartScenarioInPlace(evidencePed, true)
+            FreezeEntityPosition(evidencePed, true)
+            SetEntityInvincible(evidencePed, true)
+            SetBlockingOfNonTemporaryEvents(evidencePed, true)
+            TaskStartScenarioInPlace(evidencePed, "WORLD_HUMAN_GUARD_STAND", 0, true) 
+            exports['qb-target']:AddBoxZone("evidenceCombo_"..k, vector4(v.evidence.x, v.evidence.y, v.evidence.z, v.evidence.w), 1.0, 1.0, {
+                name = "evidenceCombo_"..k,
+                heading = 11,
+                debugPoly = false,
+                minZ = v.evidence.z - 1,
+                maxZ = v.evidence.z + 1,
+            }, {
+                options = {
+                    {  
+                        type = "client",
+                        event = "police:client:EvidenceStashDrawer",
+                        targeticon = "fas fa-dungeon",
+                        icon = "fas fa-dungeon",
+                        label = "Store Evidence",
+                        job = {
+                            ["police"] = 0,
+                            ["sheriff"] = 0,
+                            ["trooper"] = 0,
+                        },
+                    },
+                },
+                distance = 4.5
+            })
+        end
 
         -- Police Trash
         for k, v in pairs(Config.Locations["trash"]) do
