@@ -83,15 +83,15 @@ Config.Locations = {
     ["evidence"] = {
  
         { -- MRPD
-            evidence = vector4(472.29, -1000.34, 26.27, 312.07)
+            evidence = vector3(472.29, -1000.34, 26.27)
         },
  
         { -- MRPD 
-            evidence = vector4(472.54, -991.21, 26.27, 290.73)
+            evidence = vector3(472.54, -991.21, 26.27)
         },      
 
         { -- MRPD 
-            evidence = vector4(446.83, -997.53, 30.69, 321.53)
+            evidence = vector3(446.83, -997.53, 30.69)
         },     
     },
     ["stations"] = {
