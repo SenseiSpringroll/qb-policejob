@@ -464,36 +464,62 @@ end)
 --         TakeOutVehicle(vehicle)
 -- end)
 
+--RegisterNetEvent('police:client:EvidenceStashDrawer', function(data)
+--    local currentEvidence = data.currentEvidence
+    --local pos = GetEntityCoords(PlayerPedId())
+    --local takeLoc = Config.Locations["evidence"][currentEvidence]
+
+--    if not takeLoc then return end
+
+--    if #(pos - takeLoc) <= 1.0 then
+--        local drawer = exports['qb-input']:ShowInput({
+--            header = Lang:t('info.evidence_stash', {value = currentEvidence}),
+--            submitText = "open",
+--            inputs = {
+--                {
+--                    type = 'number',
+--                    isRequired = true,
+--                    name = 'slot',
+--                    text = Lang:t('info.slot')
+--                }
+--            }
+--        })
+--        if drawer then
+--            if not drawer.slot then return end
+--            TriggerServerEvent("inventory:server:OpenInventory", "stash", Lang:t('info.current_evidence', {value = currentEvidence, value2 = drawer.slot}), {
+--                maxweight = 4000000,
+--                slots = 500,
+--            })
+--            TriggerEvent("inventory:client:SetCurrentStash", Lang:t('info.current_evidence', {value = currentEvidence, value2 = drawer.slot}))
+--        end
+--    else
+--        exports['qb-menu']:closeMenu()
+--    end
+--end)
+
 RegisterNetEvent('police:client:EvidenceStashDrawer', function(data)
     local currentEvidence = data.currentEvidence
     --local pos = GetEntityCoords(PlayerPedId())
-    local takeLoc = Config.Locations["evidence"][currentEvidence]
 
-    if not takeLoc then return end
-
-    if #(pos - takeLoc) <= 1.0 then
-        local drawer = exports['qb-input']:ShowInput({
-            header = Lang:t('info.evidence_stash', {value = currentEvidence}),
-            submitText = "open",
-            inputs = {
-                {
-                    type = 'number',
-                    isRequired = true,
-                    name = 'slot',
-                    text = Lang:t('info.slot')
-                }
+    local drawer = exports['qb-input']:ShowInput({
+        header = Lang:t('info.evidence_stash', {value = currentEvidence}),
+        submitText = "open",
+        inputs = {
+            {
+                type = 'number',
+                isRequired = true,
+                name = 'slot',
+                text = Lang:t('info.slot')
             }
+        }
+    })
+    if drawer then
+        if not drawer.slot then return end
+        TriggerServerEvent("inventory:server:OpenInventory", "stash", Lang:t('info.current_evidence', {value = currentEvidence, value2 = drawer.slot}), {
+            maxweight = 4000000,
+            slots = 500,
         })
-        if drawer then
-            if not drawer.slot then return end
-            TriggerServerEvent("inventory:server:OpenInventory", "stash", Lang:t('info.current_evidence', {value = currentEvidence, value2 = drawer.slot}), {
-                maxweight = 4000000,
-                slots = 500,
-            })
-            TriggerEvent("inventory:client:SetCurrentStash", Lang:t('info.current_evidence', {value = currentEvidence, value2 = drawer.slot}))
-        end
-    else
-        exports['qb-menu']:closeMenu()
+        TriggerEvent("inventory:client:SetCurrentStash", Lang:t('info.current_evidence', {value = currentEvidence, value2 = drawer.slot}))
     end
 end)
 
@@ -1061,46 +1087,46 @@ end
 
 CreateThread(function()
     -- Evidence Storage
-    local evidenceZones = {}
-    for _, v in pairs(Config.Locations["evidence"]) do
-        evidenceZones[#evidenceZones+1] = BoxZone:Create(
-            vector3(vector3(v.x, v.y, v.z)), 2, 1, {
-            name="box_zone",
-            debugPoly = false,
-            minZ = v.z - 1,
-            maxZ = v.z + 1,
-        })
-    end
+    --local evidenceZones = {}
+    --for _, v in pairs(Config.Locations["evidence"]) do
+    --    evidenceZones[#evidenceZones+1] = BoxZone:Create(
+    --        vector3(vector3(v.x, v.y, v.z)), 2, 1, {
+    --        name="box_zone",
+    --        debugPoly = false,
+    --       minZ = v.z - 1,
+    --        maxZ = v.z + 1,
+    --    })
+    --end
 
 
-    local evidenceCombo = ComboZone:Create(evidenceZones, {name = "evidenceCombo", debugPoly = false})
-    evidenceCombo:onPlayerInOut(function(isPointInside)
-        if isPointInside then
-            if PlayerJob.type == "leo" and PlayerJob.onduty then
-                local currentEvidence = 0
-                local pos = GetEntityCoords(PlayerPedId())
+    --local evidenceCombo = ComboZone:Create(evidenceZones, {name = "evidenceCombo", debugPoly = false})
+    --evidenceCombo:onPlayerInOut(function(isPointInside)
+    --    if isPointInside then
+    --        if PlayerJob.type == "leo" and PlayerJob.onduty then
+    --            local currentEvidence = 0
+    --            local pos = GetEntityCoords(PlayerPedId())
 
-                for k, v in pairs(Config.Locations["evidence"]) do
-                    if #(pos - v) < 2 then
-                        currentEvidence = k
-                    end
-                end
-                exports['qb-menu']:showHeader({
-                    {
-                        header = Lang:t('info.evidence_stash', {value = currentEvidence}),
-                        params = {
-                            event = 'police:client:EvidenceStashDrawer',
-                            args = {
-                                currentEvidence = currentEvidence
-                            }
-                        }
-                    }
-                })
-            end
-        else
-            exports['qb-menu']:closeMenu()
-        end
-    end)
+    --            for k, v in pairs(Config.Locations["evidence"]) do
+    --                if #(pos - v) < 2 then
+    --                    currentEvidence = k
+    --                end
+    --            end
+    --           exports['qb-menu']:showHeader({
+    --                {
+    --                    header = Lang:t('info.evidence_stash', {value = currentEvidence}),
+    --                    params = {
+    --                        event = 'police:client:EvidenceStashDrawer',
+    --                        args = {
+    --                            currentEvidence = currentEvidence
+    --                        }
+    --                    }
+    --                }
+    --            })
+    --        end
+    --    else
+    --        exports['qb-menu']:closeMenu()
+    --    end
+    --end)
 
     -- Helicopter
     --local helicopterZones = {}
